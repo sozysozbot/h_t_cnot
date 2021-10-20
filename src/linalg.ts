@@ -28,6 +28,16 @@ export const mmul: (a: Mat, b: Mat) => Mat = (a: Mat, b: Mat) => {
     return ans;
 }
 
+export const clone: (u: Mat) => Mat = (u: Mat) => {
+    const ans = zero();
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            ans[i][j] = u[i][j];
+        }
+    }
+    return ans;
+}
+
 export const dagger: (u: Mat) => Mat = (u: Mat) => {
     const ans = zero();
     for (let i = 0; i < 4; i++) {
@@ -89,4 +99,30 @@ export const random_unitary: () => Mat = () => {
     // > A simple method starts from an N×N matrix filled with independent Gaussian random variables [Complex for U(N) and real for O(N)]. 
     // > Then orthonormalize the columns via Gram-Schmidt and you're done.
     return gram_schmidt(random_gaussian());
+}
+
+/**
+ * Edit m[i][j] so that its phase changes by e^iφ. To keep the matrix unitary, all the elements in the same row and in the same column gets multiplied by e^(iφ/2).
+ * @param m The unitary matrix
+ * @param I ith row (0-indexed)
+ * @param J jth row (0-indexed)
+ * @param phi phase
+ * @returns 
+ */
+export const edit_arg_at: (m: Mat, I: number, J: number, phi: number) => Mat = (m: Mat, I: number, J: number, phi: number) => {
+    const ans = zero();
+    const half_phase = (new Complex(0, phi / 2)).exp();
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            ans[i][j] = m[i][j];
+
+            if (i === I) {
+                ans[i][j] = ans[i][j].mul(half_phase);
+            }
+            if (j === J) {
+                ans[i][j] = ans[i][j].mul(half_phase)
+            }
+        }
+    }
+    return ans;
 }
