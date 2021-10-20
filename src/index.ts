@@ -17,6 +17,28 @@ const zero: () => Mat = () => {
     ]
 }
 
+const mmul: (a: Mat, b: Mat) => Mat = (a: Mat, b: Mat) => {
+    const ans = zero();
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            for (let k = 0; k < 4; k++) {
+                ans[i][j] = ans[i][j].add(a[i][k].mul(b[k][j]))
+            }
+        }
+    }
+    return ans;
+}
+
+const dagger: (u: Mat) => Mat = (u: Mat) => {
+    const ans = zero();
+    for (let i = 0; i < 4; i++) {
+        for (let j = 0; j < 4; j++) {
+            ans[i][j] = u[j][i].conjugate()
+        }
+    }
+    return ans;
+}
+
 const random_gaussian: () => Mat = () => {
     const ans = zero();
     for (let i = 0; i < 4; i++) {
@@ -39,9 +61,9 @@ const dot: (u: Vec, v: Vec) => Complex = (u: Vec, v: Vec) =>
 
 const proj: (u: Vec, v: Vec) => Vec = (u: Vec, v: Vec) => scale(dot(u, v).div(dot(u, u)), u);
 
-const normalize: (u: Vec) => Vec = (u: Vec) => scale(dot(u,u).sqrt().inverse(), u);
+const normalize: (u: Vec) => Vec = (u: Vec) => scale(dot(u, u).sqrt().inverse(), u);
 
-const sub: (u: Vec, v: Vec) => Vec = (u: Vec, v:Vec) => [
+const sub: (u: Vec, v: Vec) => Vec = (u: Vec, v: Vec) => [
     u[0].sub(v[0]),
     u[1].sub(v[1]),
     u[2].sub(v[2]),
@@ -49,9 +71,9 @@ const sub: (u: Vec, v: Vec) => Vec = (u: Vec, v:Vec) => [
 ]
 
 const gram_schmidt: (vs: Mat) => Mat = (vs: Mat) => {
-    const u0 = vs[0]; 
+    const u0 = vs[0];
     const e0 = normalize(u0);
-    const u1 = sub(vs[1], proj(u0, vs[1])); 
+    const u1 = sub(vs[1], proj(u0, vs[1]));
     const e1 = normalize(u1);
     const u2 = sub(sub(vs[2], proj(u0, vs[2])), proj(u1, vs[2]));
     const e2 = normalize(u2);
@@ -62,14 +84,18 @@ const gram_schmidt: (vs: Mat) => Mat = (vs: Mat) => {
 
 const random_unitary: () => Mat = () => {
     // According to https://mathoverflow.net/questions/333187/random-unitary-matrices :
+    // 
+    // > I understand your question as asking for a constructive method to sample uniformly from the unitary group U(N) or orthogonal group O(N), 
+    // > where "uniformly" is understood in the sense of the Haar measure. 
     // > A simple method starts from an N×N matrix filled with independent Gaussian random variables [Complex for U(N) and real for O(N)]. 
     // > Then orthonormalize the columns via Gram-Schmidt and you're done.
     return gram_schmidt(random_gaussian());
 }
 
-const test = random_unitary();
+const U = random_unitary();
+console.log("mmul(U, dagger(U))", mmul(U, dagger(U))); // Check that it is unitary
 
-const render = (a: Mat) => {
+const render_unitary = (a: Mat) => {
     const svg = document.getElementById("matrix")!;
     const SPACING = 100;
     const X_OFFSET = 50;
@@ -120,5 +146,5 @@ const render = (a: Mat) => {
 }
 
 window.onload = () => {
-    render(test)
+    render_unitary(U)
 }
