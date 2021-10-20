@@ -49,6 +49,8 @@ const render_unitary = (a: Mat) => {
                 line.setAttributeNS(null, "stroke-width", `${5 * Math.sqrt(abs)}`);
                 svg.appendChild(line);
 
+                // I will implement the dragging later
+                /*
                 const edit_arg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
                 edit_arg.setAttributeNS(null, "cy", `${CENTER.Y + CIRCLE_MAX_RADIUS * -a[i][j].im * 0.5}`);
                 edit_arg.setAttributeNS(null, "cx", `${CENTER.X + CIRCLE_MAX_RADIUS * a[i][j].re * 0.5}`);
@@ -68,6 +70,7 @@ const render_unitary = (a: Mat) => {
                 edit_abs.setAttributeNS(null, "stroke-width", "2");
                 edit_abs.style.cursor = "ew-resize";
                 svg.appendChild(edit_abs);
+                */
             }
         }
     }
