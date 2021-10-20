@@ -3,7 +3,9 @@
   "version": "0.0.0",
   "description": "Universal quantum gates",
   "main": "split.js",
-  "dependencies": {},
+  "dependencies": {
+    "ts-complex-numbers": "^1.0.5"
+  },
   "devDependencies": {
     "css-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.2.2",
