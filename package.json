@@ -4,9 +4,12 @@
   "description": "Universal quantum gates",
   "main": "split.js",
   "dependencies": {
-    "ts-complex-numbers": "^1.0.5"
+    "@types/random-normal": "^1.0.1",
+    "complex.js": "^2.0.5",
+    "random-normal": "^1.0.0"
   },
   "devDependencies": {
+    "@types/complex.js": "^2.0.2",
     "css-loader": "^6.2.0",
     "mini-css-extract-plugin": "^2.2.2",
     "node-sass": "^6.0.1",
