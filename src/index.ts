@@ -11,17 +11,17 @@ const render_unitary = (a: Mat) => {
     const CIRCLE_MAX_RADIUS = 40;
     for (let i = 0; i < 4; i++) {
         for (let j = 0; j < 4; j++) {
-            const center = {
-                y: Y_OFFSET + i * SPACING, // ith row 
-                x: X_OFFSET + j * SPACING, // jth column 
+            const CENTER = {
+                Y: Y_OFFSET + i * SPACING, // ith row 
+                X: X_OFFSET + j * SPACING, // jth column 
             };
 
             const abs = a[i][j].abs();
 
             if (abs < 0.05) {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttributeNS(null, "cy", `${center.y}`);
-                circle.setAttributeNS(null, "cx", `${center.x}`);
+                circle.setAttributeNS(null, "cy", `${CENTER.Y}`);
+                circle.setAttributeNS(null, "cx", `${CENTER.X}`);
                 circle.setAttributeNS(null, "r", `${CIRCLE_MAX_RADIUS * abs}`);
                 circle.setAttributeNS(null, "fill", "#000000");
                 circle.setAttributeNS(null, "stroke", "#000000");
@@ -30,8 +30,8 @@ const render_unitary = (a: Mat) => {
 
             } else {
                 const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-                circle.setAttributeNS(null, "cy", `${center.y}`);
-                circle.setAttributeNS(null, "cx", `${center.x}`);
+                circle.setAttributeNS(null, "cy", `${CENTER.Y}`);
+                circle.setAttributeNS(null, "cx", `${CENTER.X}`);
                 circle.setAttributeNS(null, "r", `${CIRCLE_MAX_RADIUS * abs}`);
                 circle.setAttributeNS(null, "fill", "#009f80");
                 circle.setAttributeNS(null, "stroke", "#005242");
@@ -40,14 +40,34 @@ const render_unitary = (a: Mat) => {
 
                 const line = document.createElementNS("http://www.w3.org/2000/svg", "path");
                 line.setAttributeNS(null, "d", `m 
-                ${center.x} 
-                ${center.y} 
+                ${CENTER.X} 
+                ${CENTER.Y} 
                 ${CIRCLE_MAX_RADIUS * a[i][j].re} 
                 ${CIRCLE_MAX_RADIUS * -a[i][j].im /* `i` must point in the negative Y direction */}
                 `);
                 line.setAttributeNS(null, "stroke", "#000000");
                 line.setAttributeNS(null, "stroke-width", `${5 * Math.sqrt(abs)}`);
                 svg.appendChild(line);
+
+                const edit_arg = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                edit_arg.setAttributeNS(null, "cy", `${CENTER.Y + CIRCLE_MAX_RADIUS * -a[i][j].im * 0.5}`);
+                edit_arg.setAttributeNS(null, "cx", `${CENTER.X + CIRCLE_MAX_RADIUS * a[i][j].re * 0.5}`);
+                edit_arg.setAttributeNS(null, "r", `${CIRCLE_MAX_RADIUS * abs * 0.15}`);
+                edit_arg.setAttributeNS(null, "fill", "#808080");
+                edit_arg.setAttributeNS(null, "stroke", "#005242");
+                edit_arg.setAttributeNS(null, "stroke-width", "1");
+                edit_arg.style.cursor = "move";
+                svg.appendChild(edit_arg);
+
+                const edit_abs = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+                edit_abs.setAttributeNS(null, "cy", `${CENTER.Y}`);
+                edit_abs.setAttributeNS(null, "cx", `${CENTER.X + CIRCLE_MAX_RADIUS * abs}`);
+                edit_abs.setAttributeNS(null, "r", `${CIRCLE_MAX_RADIUS * abs * 0.2}`);
+                edit_abs.setAttributeNS(null, "fill", "#ffffff");
+                edit_abs.setAttributeNS(null, "stroke", "#005242");
+                edit_abs.setAttributeNS(null, "stroke-width", "2");
+                edit_abs.style.cursor = "ew-resize";
+                svg.appendChild(edit_abs);
             }
         }
     }
