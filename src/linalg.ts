@@ -103,11 +103,11 @@ export const random_unitary: () => Mat = () => {
 
 /**
  * Edit m[i][j] so that its phase changes by e^iφ. To keep the matrix unitary, all the elements in the same row and in the same column gets multiplied by e^(iφ/2).
- * @param m The unitary matrix
+ * @param m a unitary matrix
  * @param I ith row (0-indexed)
- * @param J jth row (0-indexed)
+ * @param J jth column (0-indexed)
  * @param phi phase
- * @returns 
+ * @returns another unitary matrix
  */
 export const edit_arg_at: (m: Mat, I: number, J: number, phi: number) => Mat = (m: Mat, I: number, J: number, phi: number) => {
     const ans = zero();
@@ -124,5 +124,73 @@ export const edit_arg_at: (m: Mat, I: number, J: number, phi: number) => Mat = (
             }
         }
     }
+    return ans;
+}
+
+const edit_abs_at_0_0: (m: Mat, delta: number) => Mat = (m: Mat, delta: number) => {
+    // Too big; cannot grow
+    if (m[0][0].abs() > 0.95 && delta > 0) { return m; }
+    // Too small; cannot shrink
+    if (m[0][0].abs() < 0.05 && delta < 0) { return m; }
+
+    const tweaked = clone(m);
+
+    // Make M[0][0] grow by a factor of e^δ, and then we need to shrink the remaining three components 
+    tweaked[0][0] = m[0][0].mul(new Complex(delta, 0).exp());
+    const remaining_norm_old = 1 - (m[0][0].abs() * m[0][0].abs());
+    const remaining_norm_new = 1 - (tweaked[0][0].abs() * tweaked[0][0].abs());
+    if (remaining_norm_new < 0.05 * 0.05 * (4 - 1)) { return m; }
+    const scaling = Math.sqrt(remaining_norm_new / remaining_norm_old);
+    tweaked[0][1] = m[0][1].mul(scaling);
+    tweaked[0][2] = m[0][2].mul(scaling);
+    tweaked[0][3] = m[0][3].mul(scaling);
+
+    // The matrix is no longer unitary, so we need Gram-Schmidt to kick in
+    // Note that Gram-Schmidt implemented here preserves the unit vector m[0]
+    return gram_schmidt(tweaked)
+}
+
+/**
+ * Try to edit m[i][j] so that its absolute value changes by e^δ. To keep the matrix unitary, a bunch of dirty hacks are employed.
+ * @param m a unitary matrix
+ * @param I ith row (0-indexed)
+ * @param J jth column (0-indexed)
+ * @param delta δ such that absolute value of m[i][j] changes by e^δ
+ * @returns another unitary matrix
+ */
+ export const edit_abs_at: (m: Mat, I: number, J: number, delta: number) => Mat = (m: Mat, I: number, J: number, delta: number) => {
+    let ans = clone(m);
+    // Swap row I and row 0
+    if (I !== 0) {
+        [ans[0], ans[I]] = [ans[I], ans[0]];
+    }
+
+    ans = dagger(ans);
+
+    // Swap "row" J and "row" 0
+    if (J !== 0) {
+        [ans[0], ans[J]] = [ans[J], ans[0]];
+    }
+
+    ans = dagger(ans);
+
+    // Now the element that we want to edit is at (0,0).
+    // We do it twice to pretend that we are treating rows and columns symmetrically,
+    ans = edit_abs_at_0_0(ans, delta / 2);
+    ans = dagger(ans);
+    ans = edit_abs_at_0_0(ans, delta / 2);
+
+    // We need a `dagger`, but let's swap "row" J and "row" 0 before applying the `dagger`.
+    if (J !== 0) {
+        [ans[0], ans[J]] = [ans[J], ans[0]];
+    }
+    
+    ans = dagger(ans);
+
+    // Swap row I and row 0
+    if (I !== 0) {
+        [ans[0], ans[I]] = [ans[I], ans[0]];
+    }
+
     return ans;
 }
