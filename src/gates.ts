@@ -2,7 +2,7 @@ type SingleBitGate = "H" | "T";
 
 type BitIndex = 1 | 2;
 
-type TwoBitGate = { type: "single", index: BitIndex, gate: SingleBitGate }
+export type TwoBitGate = { type: "single", index: BitIndex, gate: SingleBitGate }
     | { type: "cnot", control_bit: BitIndex }
 
 import Complex from 'complex.js';
