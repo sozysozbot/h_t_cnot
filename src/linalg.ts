@@ -16,6 +16,15 @@ const zero: () => Mat = () => {
     ]
 }
 
+export const identity: () => Mat = () => {
+    return [
+        [Complex.ONE, Complex.ZERO, Complex.ZERO, Complex.ZERO],
+        [Complex.ZERO, Complex.ONE, Complex.ZERO, Complex.ZERO],
+        [Complex.ZERO, Complex.ZERO, Complex.ONE, Complex.ZERO],
+        [Complex.ZERO, Complex.ZERO, Complex.ZERO, Complex.ONE],
+    ]
+}
+
 export const mmul: (a: Mat, b: Mat) => Mat = (a: Mat, b: Mat) => {
     const ans = zero();
     for (let i = 0; i < 4; i++) {

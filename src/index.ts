@@ -1,10 +1,12 @@
+import { gates_to_matrix, random_gate } from './gates';
 import { dagger, Mat, mmul, random_unitary } from './linalg'
 
 const U = random_unitary();
 console.log("mmul(U, dagger(U))", mmul(U, dagger(U))); // Check that it is unitary
 
-const render_unitary = (a: Mat) => {
-    const svg = document.getElementById("matrix")!;
+const render_unitary = (svg_id: string, a: Mat) => {
+    console.log(svg_id, a);
+    const svg = document.getElementById(svg_id)!;
     const SPACING = 100;
     const X_OFFSET = 50;
     const Y_OFFSET = 50;
@@ -77,5 +79,8 @@ const render_unitary = (a: Mat) => {
 }
 
 window.onload = () => {
-    render_unitary(U)
+    render_unitary("matrix", U);
+    const random_gates = Array.from({ length: 100 }, random_gate);
+    console.log(random_gates);
+    render_unitary("approx", gates_to_matrix(random_gates));
 }
