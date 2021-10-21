@@ -12,17 +12,68 @@ export function gates_to_matrix(gs: TwoBitGate[]): Mat {
     return gs.map(to_matrix).reduce((a, b) => mmul(a, b), identity());
 }
 
-export function random_gate(): TwoBitGate {
-    const candidates: TwoBitGate[] = [
-        {type: "single", index: 1, gate: "H"},
-        {type: "single", index: 2, gate: "H"},
-        {type: "single", index: 1, gate: "T"},
-        {type: "single", index: 2, gate: "T"},
-        {type: "cnot", control_bit: 1},
-        {type: "cnot", control_bit: 2},
-    ];
-    return candidates[Math.random() * 6 | 0]
+const candidates: TwoBitGate[] = [
+    { type: "single", index: 1, gate: "H" },
+    { type: "single", index: 2, gate: "H" },
+    { type: "single", index: 1, gate: "T" },
+    { type: "single", index: 2, gate: "T" },
+    { type: "cnot", control_bit: 1 },
+    { type: "cnot", control_bit: 2 },
+];
+
+function choose_from<T>(a: T[]): T {
+    return a[Math.random() * a.length | 0]
 }
+
+export function non_wasteful_random_gates(o: { length: number }): TwoBitGate[] {
+    const ans: TwoBitGate[] = [];
+    let first_qubit_ended_with_h = false;
+    let second_qubit_ended_with_h = false;
+    let ended_in_cnot_1 = false;
+    let ended_in_cnot_2 = false;
+    while (ans.length < o.length) {
+        const cand: TwoBitGate[] = [
+            { type: "single", index: 1, gate: "T" },
+            { type: "single", index: 2, gate: "T" },
+        ];
+        if (!first_qubit_ended_with_h) {
+            cand.push({ type: "single", index: 1, gate: "H" });
+        }
+        if (!second_qubit_ended_with_h) {
+            cand.push({ type: "single", index: 2, gate: "H" })
+        }
+        if (!ended_in_cnot_1) {
+            cand.push({ type: "cnot", control_bit: 1 });
+        }
+        if (!ended_in_cnot_2) {
+            cand.push({ type: "cnot", control_bit: 2 });
+        }
+
+        const gate = choose_from(cand);
+        ans.push(gate);
+        if (gate.type === "cnot") {
+            first_qubit_ended_with_h = false;
+            second_qubit_ended_with_h = false;
+            ended_in_cnot_1 = (gate.control_bit === 1);
+            ended_in_cnot_2 = (gate.control_bit === 2);
+        } else if (gate.type === "single") {
+            ended_in_cnot_1 = false;
+            ended_in_cnot_2 = false;
+
+            if (gate.index === 1) {
+                first_qubit_ended_with_h = gate.gate === "H";
+            }
+
+            if (gate.index === 2) {
+                second_qubit_ended_with_h = gate.gate === "H";
+            }
+        }
+
+    }
+
+    return ans;
+}
+
 
 type TwoByTwo<T> = [[T, T], [T, T]]
 

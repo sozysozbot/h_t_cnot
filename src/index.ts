@@ -1,4 +1,4 @@
-import { gates_to_matrix, random_gate, TwoBitGate } from './gates';
+import { gates_to_matrix, non_wasteful_random_gates, TwoBitGate } from './gates';
 import { dagger, Mat, mmul, random_unitary } from './linalg'
 
 const U = random_unitary();
@@ -9,12 +9,18 @@ const render_gate_svg = (gates: TwoBitGate[]) => {
 
     let inner = "";
 
-    let x_position = 2.5;
+    const MARGIN_LEFT = 5;
+    const TRAILING_WIRE = 3.5;
+    const BETWEEN_RECT_AND_CNOT = 4.5;
+    const BETWEEN_TWO_CNOTS = 7;
+    const BETWEEN_TWO_RECTS = 2;
+    const RECT_WIDTH = 5;
+    let x_position = MARGIN_LEFT + TRAILING_WIRE;
     let x_position_occupied = false;
     for (let i = 0; i < gates.length; i++) {
         const current_gate = gates[i];
         if (current_gate.type === "single") {
-            inner += `<rect x="${x_position}" y="${-5 + current_gate.index * 6}" width="5" height="4" stroke-width="0.125" stroke="#000000" fill="#ffffff" />`;
+            inner += `<rect x="${x_position}" y="${-5 + current_gate.index * 6}" width="${RECT_WIDTH}" height="4" stroke-width="0.125" stroke="#000000" fill="#ffffff" />`;
             if (current_gate.gate === "H") {
                 inner += `<path d="m${x_position + 3.7} ${-4.1 + current_gate.index * 6}c0-.037-.031-.037-.048-.037c-.119 0-.246.007-.369.007c-.126 0-.256-.007-.379-.007c-.027 0-.065 0-.065.065c0 .034.024.034.089.034c.085 0 .181 0 .181.055c0 .021 0 .031-.007.051l-.215.863h-.938l.204-.826c.031-.116.051-.143.263-.143c.058 0 .089 0 .089-.061c0-.037-.031-.037-.048-.037c-.119 0-.246.007-.369.007c-.126 0-.256-.007-.379-.007c-.027 0-.065 0-.065.065c0 .034.024.034.089.034c.085 0 .181 0 .181.055c0 .021 0 .031-.007.051l-.467 1.879c-.031.119-.051.147-.259.147c-.061 0-.092 0-.092.065c0 .034.034.034.048.034c.119 0 .246-.007.369-.007c.123 0 .256.007.376.007c.027 0 .065 0 .065-.065c0-.034-.027-.034-.079-.034c-.191 0-.191-.027-.191-.058l.007-.051.242-.956h.937l-.228.918c-.031.119-.051.147-.259.147c-.061 0-.092 0-.092.065c0 .034.034.034.048.034c.119 0 .246-.007.369-.007c.123 0 .256.007.376.007c.027 0 .065 0 .065-.065c0-.034-.027-.034-.079-.034c-.191 0-.191-.027-.191-.058c0-.027.003-.044.007-.051l.469-1.881c.031-.116.051-.143.263-.143c.058 0 .089 0 .089-.061z" />`;
             } else if (current_gate.gate === "T") {
@@ -23,18 +29,18 @@ const render_gate_svg = (gates: TwoBitGate[]) => {
 
             const next: TwoBitGate | undefined = gates[i + 1];
             if (next?.type === "cnot") {
-                x_position += 12.5;
+                x_position += RECT_WIDTH + BETWEEN_RECT_AND_CNOT;
                 x_position_occupied = false;
             } else if (next?.type === "single") {
                 if (next.index === current_gate.index || x_position_occupied) {
-                    x_position += 7;
+                    x_position += RECT_WIDTH + BETWEEN_TWO_RECTS;
                     x_position_occupied = false;
                 } else {
                     // render on the same x position, since the two gates act on different qubits
                     x_position_occupied = true;
                 }
             } else if (next === undefined) {
-                x_position += 8.5;
+                x_position += RECT_WIDTH + TRAILING_WIRE;
                 x_position_occupied = false;
             }
         } else if (current_gate.type === "cnot") {
@@ -49,18 +55,19 @@ const render_gate_svg = (gates: TwoBitGate[]) => {
             }
 
             if (gates[i + 1]?.type === "cnot") {
-                x_position += 9;
+                x_position += BETWEEN_TWO_CNOTS;
             } else if (gates[i + 1]?.type === "single") {
-                x_position += 7.5;
+                x_position += BETWEEN_RECT_AND_CNOT;
             } else if (gates[i + 1] === undefined) {
-                x_position += 3.5;
+                x_position += TRAILING_WIRE;
             }
             x_position_occupied = false;
         }
     }
     svg.innerHTML = `
-    <path d="m-1 3 h ${x_position - (-1)}" stroke-width="0.125" stroke="#000000" />
-    <path d="m-1 9 h ${x_position - (-1)}" stroke-width="0.125" stroke="#000000" />` + inner;
+    <path d="m${MARGIN_LEFT} 3 h ${x_position}" stroke-width="0.125" stroke="#000000" />
+    <path d="m${MARGIN_LEFT} 9 h ${x_position}" stroke-width="0.125" stroke="#000000" />` + inner;
+    svg.setAttribute("viewBox", `0 0 ${x_position + MARGIN_LEFT * 2} 15`);
 }
 
 const render_unitary = (svg_id: string, a: Mat) => {
@@ -139,8 +146,8 @@ const render_unitary = (svg_id: string, a: Mat) => {
 
 window.onload = () => {
     render_unitary("matrix", U);
-    const random_gates = Array.from({ length: 4 }, random_gate);
-    console.log(random_gates);
-    render_gate_svg(random_gates);
-    render_unitary("approx", gates_to_matrix(random_gates));
+    const gates = non_wasteful_random_gates({ length: 100 });
+    console.log(gates);
+    render_gate_svg(gates);
+    render_unitary("approx", gates_to_matrix(gates));
 }
