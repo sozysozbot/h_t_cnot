@@ -1,4 +1,4 @@
-import { dagger, Mat, mmul, random_unitary, Vec } from './linalg'
+import { dagger, Mat, mmul, random_unitary } from './linalg'
 
 const U = random_unitary();
 console.log("mmul(U, dagger(U))", mmul(U, dagger(U))); // Check that it is unitary
