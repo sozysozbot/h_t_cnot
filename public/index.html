@@ -7,23 +7,26 @@
 
 <body style="margin: 0 auto; max-width: 80%;">
     <h2>H, T & CNOT ―― Universal Quantum Gates</h2>
-    <div style="display: flex;">
+    <div style="display: flex;margin-bottom: 20px;">
         <div><span style="vertical-align: middle; font-size: xx-large;">U =</span> <svg id="matrix" width="300"
-                height="300" viewBox="0 0 400 400" style="vertical-align: middle"></svg></div>
-        <div>
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;
-            &nbsp;&nbsp;&nbsp;&nbsp;
+                height="300" viewBox="0 0 400 400" style="vertical-align: middle"></svg>
+            <span style="vertical-align: middle;"> and we want to approximate it as&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            <span style="vertical-align: middle; font-size: xx-large;">U' =</span> <svg id="approx" width="300"
+                height="300" viewBox="0 0 400 400" style=" vertical-align: middle"></svg>
         </div>
-        <div><span style="vertical-align: middle; font-size: xx-large;">U' =</span> <svg id="approx" width="300"
-                height="300" viewBox="0 0 400 400" style=" vertical-align: middle"></svg></div>
     </div>
+    <span style="vertical-align: middle;"> which is made up of <span id="gate_count"></span> gates:</span>
+    <div></div>
     
-    <div style="overflow-x: scroll; width: 900px; margin-top: 40px;">
-        <svg id="gates" style=" vertical-align: middle" height="150" version="1.1" viewBox="0 0 120 15" xmlns="http://www.w3.org/2000/svg">
+    <div style="overflow-x: scroll; width: 900px; margin-bottom: 20px;">
+        <svg id="gates" style=" vertical-align: middle" height="150" version="1.1" viewBox="0 0 120 15"
+            xmlns="http://www.w3.org/2000/svg">
         </svg>
     </div>
-    
+    <div>
+        <img style="vertical-align: middle;" src="fidelity.png" height="40">
+        <span id="fidelity" style="vertical-align: middle; font-size: x-large;"></span>
+    </div>
+
     <script src="index.js"></script>
 </body>

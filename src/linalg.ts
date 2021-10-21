@@ -57,6 +57,10 @@ export const dagger: (u: Mat) => Mat = (u: Mat) => {
     return ans;
 }
 
+export const trace: (u: Mat) => Complex = (u: Mat) => Array.from({ length: 4 }, (_, i) => u[i][i]).reduce((a, b) => a.add(b), Complex.ZERO);
+
+export const fidelity = (u: Mat, v: Mat) => trace(mmul(dagger(u), v)).abs() / 4;
+
 const random_gaussian: () => Mat = () => {
     const ans = zero();
     for (let i = 0; i < 4; i++) {
@@ -167,7 +171,7 @@ const edit_abs_at_0_0: (m: Mat, delta: number) => Mat = (m: Mat, delta: number) 
  * @param delta δ such that absolute value of m[i][j] changes by e^δ
  * @returns another unitary matrix
  */
- export const edit_abs_at: (m: Mat, I: number, J: number, delta: number) => Mat = (m: Mat, I: number, J: number, delta: number) => {
+export const edit_abs_at: (m: Mat, I: number, J: number, delta: number) => Mat = (m: Mat, I: number, J: number, delta: number) => {
     let ans = clone(m);
     // Swap row I and row 0
     if (I !== 0) {
@@ -193,7 +197,7 @@ const edit_abs_at_0_0: (m: Mat, delta: number) => Mat = (m: Mat, delta: number) 
     if (J !== 0) {
         [ans[0], ans[J]] = [ans[J], ans[0]];
     }
-    
+
     ans = dagger(ans);
 
     // Swap row I and row 0

@@ -1,8 +1,5 @@
 import { gates_to_matrix, non_wasteful_random_gates, TwoBitGate } from './gates';
-import { dagger, Mat, mmul, random_unitary } from './linalg'
-
-const U = random_unitary();
-console.log("mmul(U, dagger(U))", mmul(U, dagger(U))); // Check that it is unitary
+import { dagger, fidelity, Mat, mmul, random_unitary } from './linalg'
 
 const render_gate_svg = (gates: TwoBitGate[]) => {
     const svg = document.getElementById("gates")!;
@@ -144,10 +141,28 @@ const render_unitary = (svg_id: string, a: Mat) => {
     }
 }
 
+
 window.onload = () => {
+    const U = random_unitary();
     render_unitary("matrix", U);
-    const gates = non_wasteful_random_gates({ length: 100 });
-    console.log(gates);
+
+    let gates = non_wasteful_random_gates({ length: 10 });
+    let U_prime = gates_to_matrix(gates);
+    let max_fidelity = 0;
+    const MAX_I = 60;
+    for (let i = 30; i < MAX_I; i++) {
+        let new_gates = non_wasteful_random_gates({ length: i / MAX_I * 100 });
+        let new_U_prime = gates_to_matrix(new_gates);
+        let fidel = fidelity(U, new_U_prime);
+
+        if (max_fidelity < fidel) {
+            gates = new_gates;
+            U_prime = new_U_prime;
+            max_fidelity = fidel;
+        }
+    }
     render_gate_svg(gates);
-    render_unitary("approx", gates_to_matrix(gates));
+    render_unitary("approx", U_prime);
+    document.getElementById("fidelity")!.textContent = `${fidelity(U, U_prime)}`
+    document.getElementById("gate_count")!.textContent = `${gates.length}`;
 }
