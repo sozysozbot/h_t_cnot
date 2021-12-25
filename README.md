@@ -1,2 +1,2 @@
 # H, T & CNOT
-Universal quantum gates
+Universal quantum gates (work in progress)
