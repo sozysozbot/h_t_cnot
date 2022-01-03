@@ -9,7 +9,7 @@
     "random-normal": "^1.0.0"
   },
   "devDependencies": {
-    "@types/complex.js": "2.0.2",
+    "@types/complex.js": "2.0.3",
     "css-loader": "6.5.1",
     "mini-css-extract-plugin": "2.4.5",
     "node-sass": "6.0.1",
