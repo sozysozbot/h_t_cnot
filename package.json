@@ -11,7 +11,7 @@
   "devDependencies": {
     "@types/complex.js": "2.0.3",
     "css-loader": "6.7.2",
-    "mini-css-extract-plugin": "2.7.1",
+    "mini-css-extract-plugin": "2.7.2",
     "node-sass": "8.0.0",
     "ts-loader": "9.4.1",
     "sass-loader": "13.2.0",
